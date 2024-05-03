@@ -13,8 +13,10 @@ function createTaskCard(task) {
   const header = $('<h4>').addClass('card-title').text(task.title)
   //Add element for all required attributes
   const p1El = $('<p>').addClass('card-text').text(task.date)
-  const newTaskCard = $('<div>').addClass('card').append(header).append(p1El)
-  newTaskCard.id = 'task' + task.id
+  const descriptEl = $('<p>').addClass('card-text').text(task.description)
+  const deleteBtn = $('<button id="taskDeleteBtn">').addClass('btn btn-danger delete').text('Delete')
+  const newTaskCard = $('<div>').addClass('card draggable droppable').append(header).append(p1El).append(descriptEl).append(deleteBtn)
+  newTaskCard.id = 'task-card' + task.id
   return newTaskCard;
 }
 
@@ -23,35 +25,32 @@ function renderTaskList() {
   $("#todo-cards").empty();
   
   // Renders each task
-  taskList.forEach(task => {
+  taskList.forEach(function(task){
     let $taskCard = createTaskCard(task);
     $taskCard.addClass('task-card');
     $("#todo-cards").append($taskCard);
   });
 
-  // Makes cards draggable
-  $(".task-card").draggable({
-    revert: "invalid",
-    cursor: "move",
-    containment: "document",
-    helper: "clone",
-    zIndex: 100
-    
-})
 $( function() {
-  $( "#draggable" ).draggable();
-  $( ".lane" ).droppable({
-    drop: function( event, ui ) {
-      $( this )
-        .addClass( "ui-state-highlight" )
-        .find( "p" ).text ("Dropped!");
+  $( ".draggable" ).draggable({
+    drag: function( event, ui ) {
+      console.log('this is a test');
+      $(event.target)
+        // .addClass( "ui-state-highlight" )
+        // .find( "p" ).text ("Dropped!");
+        console.log(event.target);
       const droppedElementId = ui.draggable.attr('id');
       console.log("Dropped element ID:",droppedElementId);
     }
   });
-} );
+});
+$(function() {
+  $('.droppable').droppable({
+    drop:function(event, ui) {
+    }
+  })
+})
 }
-
 
 
 // Todo: create a function to handle adding a new task
@@ -67,6 +66,10 @@ taskList.push(newTask);
 localStorage.setItem('tasks', JSON.stringify(taskList));
 console.log('testing');
 renderTaskList();
+$('#task-name-input').val('');
+$('#datepicker').val('');
+$('#description').val('');
+$('#formModal').modal('hide');
 }
 
 $(function() {
@@ -92,8 +95,10 @@ $(document).ready(function () {
   
     // Add event listener for adding a new task
     $('#addTask').on('click', handleAddTask);
+    $('#taskDeleteBtn').on('click', handleDeleteTask);
   
     // Render task list
+    
     renderTaskList();
 })
 });
